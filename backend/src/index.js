@@ -2,7 +2,10 @@ import express from 'express'
 import dotenv from 'dotenv'
 import  cookieparser from 'cookie-parser'
 import cors from 'cors'
+
+
 import { connectDB } from './lib/db.js'
+import authRoutes from '../src/routes/auth.route.js'
 
 dotenv.config()
 
@@ -20,6 +23,12 @@ app.use(
         credentials: true
     })
 )
+
+
+// Routes
+
+app.use('/api/auth', authRoutes)
+
 
 
 app.listen(PORT, ()=> {
