@@ -6,8 +6,9 @@ import LoginPage from "./pages/LoginPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import { Toaster } from "react-hot-toast";
-import { useAuthStore } from "./store/userAuthStore";
+import { useAuthStore } from "./store/useAuthStore";
 import { Loader } from "lucide-react";
+import Navbar from "./components/Navbar";
 
 const App = () => {
     const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -24,7 +25,9 @@ const App = () => {
         );
     }
     return (
+      
         <div>
+           <Navbar />
             <Routes>
                 <Route
                     path="/"

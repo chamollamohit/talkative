@@ -57,7 +57,7 @@ export const useAuthStore = create<authStoreState>((set, get) => ({
             toast.success("Account created successfully");
             get().connectSocket()
         } catch (error) {
-            toast.error("Issue in Sign-Up");
+            toast.error(error.response.data.message);
         } finally {
             set({ isSigningUp: false });
         }

@@ -5,18 +5,18 @@ import cloudinary from "../lib/cloudinary.js"
 
 
 export const signup = async (req, res) => {
-    const { username, fullname, email, password } = req.body
+    const { userName, fullName, email, password } = req.body
     try {
-
-        if (!username || !fullname || !email || !password) {
+        if (!userName || !fullName || !email || !password) {
             return res.status(400).json({ message: "All fields are required" })
         }
-
+        
         if (password.length < 6) {
             return res.status(400).json({ message: "Password should be more then 6 characters long" })
         }
-
-        const user = await User.findOne({ $or: [{ username }, { email }] })
+        
+        const user = await User.findOne({ $or: [{ userName }, { email }] })
+        console.log(user);
 
         if (user) {
             return res.status(400).json({ message: "User already exist with email or username" })
@@ -27,10 +27,10 @@ export const signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt)
 
         const newUser = new User({
-            fullname,
+            fullName,
             email,
             password: hashedPassword,
-            username
+            userName
         })
 
         if (newUser) {
@@ -39,7 +39,7 @@ export const signup = async (req, res) => {
 
             res.status(201).json({
                 _id: newUser._id,
-                fullname: newUser.fullname,
+                fullName: newUser.fullName,
                 email: newUser.email,
                 profilePic: newUser.profilePic
             })
@@ -80,7 +80,7 @@ export const login = async (req, res) => {
 
         res.status(200).json({
             _id: user._id,
-            fullname: user.fullname,
+            fullName: user.fullName,
             email: user.email,
             profilePic: user.profilePic
         })
