@@ -32,7 +32,7 @@ export const sendMessage = async (req, res) => {
     try {
         const {id: reciverUserId} = req.params
         const loggedInUserId = req.user._id
-        const {message, image} = req.body
+        const {text, image} = req.body
 
         let imageUrl 
         if (image) {
@@ -40,7 +40,7 @@ export const sendMessage = async (req, res) => {
             imageUrl = uploadImage.secure_url 
         }
 
-        const newMessage = await Message.create({senderId: loggedInUserId, reciverId:reciverUserId, senderMessage: message, image: imageUrl })
+        const newMessage = await Message.create({senderId: loggedInUserId, reciverId:reciverUserId, senderMessage: text, image: imageUrl })
 
         // Todo : Socket.io implementation for real time message
         

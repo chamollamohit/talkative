@@ -6,7 +6,7 @@ import { getUser, getChat, sendMessage } from "../controller/message.contoller.j
 const router = Router()
 
 router.get('/users', protectRoute, getUser)
-router.get('/:id,', protectRoute, getChat)
+router.get('/:id', protectRoute, getChat)
 router.post('/send/:id', protectRoute, sendMessage)
 
 

@@ -13,11 +13,13 @@ type user = {
 }
 
 type message = {
+    _id: string;
     reciverId: string;
     senderId: string;
     senderMessage?: string ;
     image?: string;
-}
+    createdAt: Date
+} 
 
 interface chatStoreState {
     users: user[],
@@ -28,10 +30,10 @@ interface chatStoreState {
     selectedUser: user | null
     getUsers: () => void,
     getMessages: (userId: string) => void,
-    sendMessage: (userId: string) => void,
+    sendMessage: (messageData: {text: string, image: string | null}) => void,
     subscribeToMessage: () => void,
     unsubscribeFromMessages: () => void,
-    setSelectedUser: (selectedUser: user) => void,
+    setSelectedUser: (selectedUser: user | null) => void,
     setTyping: (isTyping: boolean) => void
 
 }
@@ -70,6 +72,8 @@ export const useChatStore = create<chatStoreState>((set, get) => ({
     },
     sendMessage: async (messageData) => {
         const { selectedUser, messages } = get();
+        console.log(messageData);
+        
         try {
             const res = await axiosInstance.post(
                 `/messages/send/${selectedUser?._id}`,

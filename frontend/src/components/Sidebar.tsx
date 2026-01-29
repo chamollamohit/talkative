@@ -30,7 +30,7 @@ const Sidebar = () => {
                         Contacts
                     </span>
                 </div>
-                {/* TODO: Online filter toggle */}
+
                 <div className="mt-3 hidden lg:flex items-center gap-2">
                     <label className="cursor-pointer flex items-center gap-2">
                         <input
@@ -44,7 +44,7 @@ const Sidebar = () => {
                         <span className="text-sm">Show online only</span>
                     </label>
                     <span className="text-xs text-zinc-500">
-                        ({onlineUsers.length - 1} online)
+                        ({onlineUsers.length > 0 ? onlineUsers.length - 1: onlineUsers.length} online)
                     </span>
                 </div>
             </div>
@@ -61,7 +61,7 @@ const Sidebar = () => {
             `}>
                         <div className="relative mx-auto lg:mx-0">
                             <img
-                                src={user.profilePic || "https://avatar.iran.liara.run/public"}
+                                src={user.profilePic || "/avatar.png"}
                                 alt={user.fullName}
                                 className="size-12 object-cover rounded-full"
                             />
