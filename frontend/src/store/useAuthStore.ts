@@ -8,9 +8,10 @@ const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5000
 interface authStoreState {
     authUser: {
         _id: string,
-        fullname: string,
+        fullName: string,
         email: string,
-        profilePic: string
+        profilePic: string,
+        createdAt: string
     } | null,
     isSigningUp: boolean,
     isLoggingIn: boolean,
