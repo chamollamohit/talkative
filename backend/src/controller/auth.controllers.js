@@ -11,10 +11,6 @@ export const signup = async (req, res) => {
             return res.status(400).json({ message: "All fields are required" })
         }
         
-        if (password.length < 6) {
-            return res.status(400).json({ message: "Password should be more then 6 characters long" })
-        }
-        
         const user = await User.findOne({ $or: [{ userName }, { email }] })
         console.log(user);
 
