@@ -42,8 +42,6 @@ export const sendMessage = async (req, res) => {
         }
 
         const newMessage = await Message.create({senderId: loggedInUserId, reciverId:reciverUserId, senderMessage: text, image: imageUrl })
-
-        // Todo : Socket.io implementation for real time message
         
         const recieverSocketId = getSocketIdFromUserId(reciverUserId)
         if (recieverSocketId) {

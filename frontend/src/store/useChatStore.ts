@@ -2,6 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
+import { devtools } from 'zustand/middleware'
 
 type user = {
     _id: string,
@@ -26,7 +27,8 @@ interface chatStoreState {
     messages: message[]
     isTyping: boolean,
     isUsersLoading: boolean,
-    isMessagesLoading:boolean
+    isMessagesLoading:boolean,
+    typingUsers: string[],
     selectedUser: user | null
     getUsers: () => void,
     getMessages: (userId: string) => void,
@@ -34,15 +36,16 @@ interface chatStoreState {
     subscribeToMessage: () => void,
     unsubscribeFromMessages: () => void,
     setSelectedUser: (selectedUser: user | null) => void,
-    setTyping: (isTyping: boolean) => void
+    setTyping: (isTyping: boolean) => void,
+    subscribeToTyping: () => void
 
 }
 
-export const useChatStore = create<chatStoreState>((set, get) => ({
+export const useChatStore = create<chatStoreState>(devtools((set, get) => ({
     messages: [],
     users: [],
     isTyping: false,
-
+    typingUsers: [],
     selectedUser: null,
     isUsersLoading: false,
     isMessagesLoading: false,
@@ -104,5 +107,40 @@ export const useChatStore = create<chatStoreState>((set, get) => ({
     },
 
     setSelectedUser: (selectedUser) => set({ selectedUser }),
-    setTyping: (isTyping) => set({ isTyping })
-}));
+    setTyping: (isTyping) => {
+        const socket = useAuthStore.getState().socket;
+        
+        if (!socket || !get().selectedUser?._id ) return;
+
+        if (isTyping) {
+            socket?.emit('typing', get().selectedUser?._id)
+        } else {            
+            socket?.emit('stopped-typing', get().selectedUser?._id)
+        }
+        set({ isTyping })
+        // get().subscribeToTyping()
+    },
+    subscribeToTyping: () => {
+        const socket = useAuthStore.getState().socket;
+        if (!socket) return;
+
+        socket.off('display-typing');
+        socket.off('hide-typing');
+        
+        socket.on('display-typing', (userId) => {
+            set((state) => ({ 
+                typingUsers: [...new Set([...state.typingUsers, userId])] 
+            }));
+            // console.log("Typing");
+            
+        });
+        
+        socket.on('hide-typing', (userId) => {
+            set((state) => ({ 
+                typingUsers: state.typingUsers.filter(id => id !== userId) 
+            }));
+            // console.log("Stopped Typing");
+        });
+        // console.log(get().typingUsers);
+    }
+})));

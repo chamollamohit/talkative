@@ -1,17 +1,26 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../store/useAuthStore";
 
 const MessageInput = () => {
     const [text, setText] = useState("");
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-
+    const { subscribeToTyping } = useChatStore();
+const socket = useAuthStore((state) => state.socket);
     const { setTyping } = useChatStore();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const textInputRef = useRef<HTMLInputElement>(null);
 
     const { sendMessage } = useChatStore();
+
+useEffect(() => {
+    if (socket) {
+        subscribeToTyping(); // Start listening immediately when chat opens
+    }
+}, [socket, subscribeToTyping]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -31,6 +40,7 @@ const MessageInput = () => {
         };
         reader.readAsDataURL(file);
     };
+
     const handleTextInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setText(e.target.value);
     };
@@ -89,8 +99,10 @@ const MessageInput = () => {
                         className="w-full input input-bordered rounded-lg input-sm sm:input-md"
                         placeholder="Type a message..."
                         value={text}
+                        ref={textInputRef}
                         onChange={handleTextInput}
                         onFocus={() => setTyping(true)}
+                        onBlur={() => setTyping(false)}
                     />
                     <input
                         type="file"
