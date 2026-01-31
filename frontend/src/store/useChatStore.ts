@@ -2,7 +2,6 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
-import { devtools } from 'zustand/middleware'
 
 type user = {
     _id: string,
@@ -41,7 +40,7 @@ interface chatStoreState {
 
 }
 
-export const useChatStore = create<chatStoreState>(devtools((set, get) => ({
+export const useChatStore = create<chatStoreState>((set, get) => ({
     messages: [],
     users: [],
     isTyping: false,
@@ -131,16 +130,13 @@ export const useChatStore = create<chatStoreState>(devtools((set, get) => ({
             set((state) => ({ 
                 typingUsers: [...new Set([...state.typingUsers, userId])] 
             }));
-            // console.log("Typing");
-            
         });
         
         socket.on('hide-typing', (userId) => {
+            
             set((state) => ({ 
                 typingUsers: state.typingUsers.filter(id => id !== userId) 
-            }));
-            // console.log("Stopped Typing");
+            }));;
         });
-        // console.log(get().typingUsers);
     }
-})));
+}));

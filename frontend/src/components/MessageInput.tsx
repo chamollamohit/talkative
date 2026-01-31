@@ -63,6 +63,7 @@ useEffect(() => {
             // Clear form
             setText("");
             setImagePreview(null);
+            if(textInputRef.current) textInputRef.current.blur()
             if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (error) {
             console.error("Failed to send message:", error);

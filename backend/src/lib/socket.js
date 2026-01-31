@@ -35,10 +35,9 @@ io.on("connection", (socket) => {
     socket.on("stopped-typing", (receiverId) => {
         const receiverSocketId = userSocketMap[receiverId];
         if (receiverSocketId) {
-            io.to(receiverSocketId).emit("hide-typing", { userId });
+            io.to(receiverSocketId).emit("hide-typing", userId);
         }
     });
-
 
     socket.on("disconnect", () => {
         console.log("User disconnected");
