@@ -22,6 +22,10 @@ app.use(
     }),
 );
 
+app.use("/health-check", (req, res) => {
+    res.json("System Running fine");
+});
+
 // Routes
 
 app.use("/api/auth", authRoutes);
