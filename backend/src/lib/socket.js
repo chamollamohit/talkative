@@ -7,7 +7,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173"],
+        origin: ["http://localhost:5173", process.env.FRONTEND_URL],
     },
 });
 
@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
     socket.on("typing", (receiverId) => {
-        const recieverSocketId = getSocketIdFromUserId(receiverId)
+        const recieverSocketId = getSocketIdFromUserId(receiverId);
         if (recieverSocketId) {
             io.to(recieverSocketId).emit("display-typing", userId);
         }
