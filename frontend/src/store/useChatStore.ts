@@ -2,6 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
+import { isAxiosError } from "axios";
 
 type user = {
     _id: string,
@@ -16,22 +17,22 @@ type message = {
     _id: string;
     reciverId: string;
     senderId: string;
-    senderMessage?: string ;
+    senderMessage?: string;
     image?: string;
     createdAt: Date
-} 
+}
 
 interface chatStoreState {
     users: user[],
     messages: message[]
     isTyping: boolean,
     isUsersLoading: boolean,
-    isMessagesLoading:boolean,
+    isMessagesLoading: boolean,
     typingUsers: string[],
     selectedUser: user | null
     getUsers: () => void,
     getMessages: (userId: string) => void,
-    sendMessage: (messageData: {text: string, image: string | null}) => void,
+    sendMessage: (messageData: { text: string, image: string | null }) => void,
     subscribeToMessage: () => void,
     unsubscribeFromMessages: () => void,
     setSelectedUser: (selectedUser: user | null) => void,
@@ -52,10 +53,14 @@ export const useChatStore = create<chatStoreState>((set, get) => ({
     getUsers: async () => {
         set({ isUsersLoading: true });
         try {
-            const res = await axiosInstance.get("/messages/users");
+            const res = await axiosInstance.get("api/messages/users");
             set({ users: res.data });
         } catch (error) {
-            toast.error(error.response.data.message);
+            if (isAxiosError(error)) {
+                toast.error(error.response?.data.message);
+            } else {
+                toast.error("Internal Error");
+            }
         } finally {
             set({ isUsersLoading: false });
         }
@@ -64,10 +69,14 @@ export const useChatStore = create<chatStoreState>((set, get) => ({
     getMessages: async (userId) => {
         set({ isMessagesLoading: true });
         try {
-            const res = await axiosInstance.get(`/messages/${userId}`);
+            const res = await axiosInstance.get(`api/messages/${userId}`);
             set({ messages: res.data });
         } catch (error) {
-            toast.error(error.response.data.message);
+            if (isAxiosError(error)) {
+                toast.error(error.response?.data.message);
+            } else {
+                toast.error("Facing issue in getting chat");
+            }
         } finally {
             set({ isMessagesLoading: false });
         }
@@ -77,12 +86,16 @@ export const useChatStore = create<chatStoreState>((set, get) => ({
 
         try {
             const res = await axiosInstance.post(
-                `/messages/send/${selectedUser?._id}`,
+                `api/messages/send/${selectedUser?._id}`,
                 messageData
             );
             set({ messages: [...messages, res.data] });
         } catch (error) {
-            toast.error(error.response.data.message);
+            if (isAxiosError(error)) {
+                toast.error(error.response?.data.message);
+            } else {
+                toast.error("Facing issue in sending message");
+            }
         }
     },
 
@@ -108,12 +121,12 @@ export const useChatStore = create<chatStoreState>((set, get) => ({
     setSelectedUser: (selectedUser) => set({ selectedUser }),
     setTyping: (isTyping) => {
         const socket = useAuthStore.getState().socket;
-        
-        if (!socket || !get().selectedUser?._id ) return;
+
+        if (!socket || !get().selectedUser?._id) return;
 
         if (isTyping) {
             socket?.emit('typing', get().selectedUser?._id)
-        } else {            
+        } else {
             socket?.emit('stopped-typing', get().selectedUser?._id)
         }
         set({ isTyping })
@@ -125,17 +138,17 @@ export const useChatStore = create<chatStoreState>((set, get) => ({
 
         socket.off('display-typing');
         socket.off('hide-typing');
-        
+
         socket.on('display-typing', (userId) => {
-            set((state) => ({ 
-                typingUsers: [...new Set([...state.typingUsers, userId])] 
+            set((state) => ({
+                typingUsers: [...new Set([...state.typingUsers, userId])]
             }));
         });
-        
+
         socket.on('hide-typing', (userId) => {
-            
-            set((state) => ({ 
-                typingUsers: state.typingUsers.filter(id => id !== userId) 
+
+            set((state) => ({
+                typingUsers: state.typingUsers.filter(id => id !== userId)
             }));;
         });
     }
